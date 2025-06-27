@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🍰 Professional Cake Cost Calculator | Thai Bakery Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -1202,7 +1203,11 @@
                 processing: 'Processing image...',
                 extractedItems: 'Extracted from receipt:',
                 addToList: 'Add to List',
-                confidence: 'Confidence'
+                confidence: 'Confidence',
+                noItemsFound: 'No ingredients found',
+                tryAgain: 'Try taking a clearer photo or use manual entry',
+                ocrError: 'OCR processing failed',
+                fallbackMessage: 'Falling back to demo mode...'
             },
             th: {
                 title: '🍰 เครื่องคำนวณต้นทุนเค้กแบบมืออาชีพ',
@@ -1245,7 +1250,11 @@
                 processing: 'กำลังประมวลผลภาพ...',
                 extractedItems: 'ข้อมูลที่ดึงจากใบเสร็จ:',
                 addToList: 'เพิ่มในรายการ',
-                confidence: 'ความแม่นยำ'
+                confidence: 'ความแม่นยำ',
+                noItemsFound: 'ไม่พบวัตถุดิบ',
+                tryAgain: 'ลองถ่ายภาพที่ชัดกว่านี้หรือกรอกข้อมูลด้วยตนเอง',
+                ocrError: 'การประมวลผล OCR ล้มเหลว',
+                fallbackMessage: 'กำลังเปลี่ยนเป็นโหมดตัวอย่าง...'
             }
         };
         
@@ -1601,11 +1610,177 @@
             // Show processing overlay
             showProcessingOverlay(t.processing);
             
-            // Simulate OCR processing (in real app, this would call OCR API)
-            setTimeout(() => {
+            // Real OCR processing with Tesseract.js
+            performRealOCR(file);
+        }
+        
+        async function performRealOCR(file) {
+            const t = translations[currentLang];
+            
+            try {
+                // Initialize Tesseract worker
+                const worker = await Tesseract.createWorker('eng+tha', 1, {
+                    logger: m => {
+                        // Update progress
+                        if (m.status === 'recognizing text') {
+                            updateProcessingProgress(Math.round(m.progress * 100));
+                        }
+                    }
+                });
+                
+                // Perform OCR recognition
+                const { data: { text } } = await worker.recognize(file);
+                
+                // Clean up worker
+                await worker.terminate();
+                
+                // Process the extracted text
+                const extractedItems = parseReceiptText(text);
+                
                 hideProcessingOverlay();
-                simulateOCRResults();
-            }, 2000);
+                
+                if (extractedItems.length > 0) {
+                    scannedItems = extractedItems;
+                    displayScannedResults();
+                } else {
+                    showNoItemsFound();
+                }
+                
+            } catch (error) {
+                console.error('OCR Error:', error);
+                hideProcessingOverlay();
+                showOCRError();
+                
+                // Fallback to simulation for demo
+                setTimeout(() => {
+                    simulateOCRResults();
+                }, 1000);
+            }
+        }
+        
+        function parseReceiptText(text) {
+            const lines = text.split('\n').filter(line => line.trim().length > 0);
+            const items = [];
+            
+            // Common ingredient patterns in English and Thai
+            const ingredientPatterns = [
+                // English patterns
+                /(?:flour|wheat|แป้ง)/i,
+                /(?:sugar|น้ำตาล)/i,
+                /(?:butter|เนย)/i,
+                /(?:egg|ไข่)/i,
+                /(?:milk|นม)/i,
+                /(?:vanilla|วานิลลา)/i,
+                /(?:chocolate|ช็อกโกแลต)/i,
+                /(?:cream|ครีม)/i,
+                /(?:oil|น้ำมัน)/i,
+                /(?:salt|เกลือ)/i,
+                /(?:baking powder|ผงฟู)/i,
+                /(?:coconut|มะพร้าว)/i
+            ];
+            
+            // Price patterns (Thai Baht)
+            const pricePattern = /(\d+(?:\.\d{1,2})?)\s*(?:฿|บาท|baht)/i;
+            const numberPattern = /(\d+(?:\.\d{1,2})?)/g;
+            
+            lines.forEach(line => {
+                // Check if line contains ingredient keywords
+                const hasIngredient = ingredientPatterns.some(pattern => pattern.test(line));
+                const priceMatch = line.match(pricePattern);
+                
+                if (hasIngredient && priceMatch) {
+                    const price = parseFloat(priceMatch[1]);
+                    const name = line.replace(pricePattern, '').trim();
+                    
+                    if (price > 0 && name.length > 2) {
+                        items.push({
+                            name: cleanIngredientName(name),
+                            price: price,
+                            unit: 'kg',
+                            confidence: calculateConfidence(line),
+                            rawText: line
+                        });
+                    }
+                }
+            });
+            
+            // Remove duplicates and sort by confidence
+            const uniqueItems = items.filter((item, index, arr) => 
+                arr.findIndex(i => i.name.toLowerCase() === item.name.toLowerCase()) === index
+            );
+            
+            return uniqueItems.sort((a, b) => b.confidence - a.confidence).slice(0, 8);
+        }
+        
+        function cleanIngredientName(name) {
+            // Remove common receipt artifacts
+            return name
+                .replace(/^\d+\s*[x×]\s*/i, '') // Remove quantity prefixes like "2x"
+                .replace(/\s+/g, ' ') // Normalize whitespace
+                .replace(/[^\w\s\u0E00-\u0E7F().-]/g, '') // Keep only letters, numbers, Thai chars, and basic punctuation
+                .trim()
+                .replace(/^[^\w\u0E00-\u0E7F]+/, '') // Remove leading non-word chars
+                .replace(/[^\w\u0E00-\u0E7F]+$/, ''); // Remove trailing non-word chars
+        }
+        
+        function calculateConfidence(line) {
+            let confidence = 50; // Base confidence
+            
+            // Higher confidence for clear price format
+            if (/\d+\.\d{2}\s*฿/.test(line)) confidence += 20;
+            
+            // Higher confidence for known ingredient words
+            if (/(?:flour|sugar|butter|egg|milk|แป้ง|น้ำตาล|เนย|ไข่|นม)/i.test(line)) confidence += 15;
+            
+            // Lower confidence for very short or very long names
+            const nameLength = line.replace(/\d+(?:\.\d{2})?\s*฿?/g, '').trim().length;
+            if (nameLength < 3) confidence -= 20;
+            if (nameLength > 50) confidence -= 10;
+            
+            // Higher confidence for multiple recognizable characters
+            const thaiChars = (line.match(/[\u0E00-\u0E7F]/g) || []).length;
+            const englishChars = (line.match(/[a-zA-Z]/g) || []).length;
+            if (thaiChars > 2 || englishChars > 3) confidence += 10;
+            
+            return Math.min(95, Math.max(10, confidence));
+        }
+        
+        function updateProcessingProgress(progress) {
+            const overlay = document.getElementById('processing-overlay');
+            if (overlay) {
+                const progressText = overlay.querySelector('.progress-text');
+                if (progressText) {
+                    progressText.textContent = `Processing: ${progress}%`;
+                }
+            }
+        }
+        
+        function showNoItemsFound() {
+            const t = translations[currentLang];
+            const resultsDiv = document.getElementById('scanner-results');
+            
+            resultsDiv.innerHTML = `
+                <div style="text-align: center; padding: 20px; color: var(--gray-500);">
+                    <div style="font-size: 2rem; margin-bottom: 8px;">😕</div>
+                    <p><strong>${t.noItemsFound || 'No ingredients found'}</strong></p>
+                    <p style="font-size: 14px;">${t.tryAgain || 'Try taking a clearer photo or use manual entry'}</p>
+                </div>
+            `;
+            resultsDiv.style.display = 'block';
+        }
+        
+        function showOCRError() {
+            const t = translations[currentLang];
+            const resultsDiv = document.getElementById('scanner-results');
+            
+            resultsDiv.innerHTML = `
+                <div style="text-align: center; padding: 20px; color: var(--danger);">
+                    <div style="font-size: 2rem; margin-bottom: 8px;">⚠️</div>
+                    <p><strong>${t.ocrError || 'OCR processing failed'}</strong></p>
+                    <p style="font-size: 14px;">${t.fallbackMessage || 'Falling back to demo mode...'}</p>
+                </div>
+            `;
+            resultsDiv.style.display = 'block';
         }
         
         function simulateOCRResults() {
@@ -1697,7 +1872,8 @@
             overlay.innerHTML = `
                 <div class="processing-spinner"></div>
                 <p style="font-size: 18px; font-weight: 600;">${message}</p>
-                <p style="font-size: 14px; opacity: 0.8;">Please wait while we analyze your receipt...</p>
+                <p class="progress-text" style="font-size: 14px; opacity: 0.8;">Initializing OCR engine...</p>
+                <p style="font-size: 12px; opacity: 0.6; margin-top: 8px;">This may take a moment on first use</p>
             `;
             document.body.appendChild(overlay);
         }
