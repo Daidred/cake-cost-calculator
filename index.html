@@ -3,404 +3,431 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cake Cost Calculator</title>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
+    <title>🍰 Cake Cost Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-    </script>
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #e91e63;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .language-switch {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border: 2px solid #e91e63;
+            border-radius: 25px;
+            padding: 5px 15px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #e91e63;
+        }
+        
+        .section {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 80px;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #e91e63;
+        }
+        
+        .btn {
+            background: #e91e63;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #c2185b;
+        }
+        
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+        
+        .btn-danger {
+            background: #f44336;
+        }
+        
+        .btn-danger:hover {
+            background: #d32f2f;
+        }
+        
+        .ingredient-item {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .results {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .results h3 {
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .result-item {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .result-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .result-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        .highlight {
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.05);
+        }
+        
+        @media (max-width: 768px) {
+            .form-row, .form-row-3 {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div id="root"></div>
-    <script type="text/babel">
-        const { useState } = React;
-        const { 
-            Plus, Trash2, Calculator, ChefHat, Moon, Sun, Globe, 
-            Clock, Users, Edit3, Package, Zap, DollarSign, Percent, Utensils 
-        } = lucide;
+    <button class="language-switch" onclick="toggleLanguage()">🇬🇧 EN / 🇹🇭 TH</button>
+    
+    <div class="container">
+        <div class="header">
+            <h1 id="title">🍰 Cake Cost Calculator</h1>
+            <p id="subtitle">Professional calculator for Thai bakeries</p>
+        </div>
+        
+        <!-- Basic Information -->
+        <div class="section">
+            <h3 id="basic-info">📋 Basic Information</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label id="cake-name-label">Cake Name</label>
+                    <input type="text" id="cake-name" placeholder="e.g., Chocolate Cake">
+                </div>
+                <div class="form-group">
+                    <label id="cake-quantity-label">Number of Cakes</label>
+                    <input type="number" id="cake-quantity" value="1" min="1">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Ingredients -->
+        <div class="section">
+            <h3 id="ingredients-title">🥚 Ingredients</h3>
+            <div class="form-row-3">
+                <input type="text" id="ingredient-name" placeholder="Ingredient name">
+                <input type="number" id="ingredient-quantity" placeholder="Quantity (g)">
+                <input type="number" id="ingredient-price" placeholder="Price/kg (฿)">
+                <button class="btn" onclick="addIngredient()" id="add-btn">Add</button>
+            </div>
+            <div id="ingredients-list"></div>
+        </div>
+        
+        <!-- Labor & Settings -->
+        <div class="section">
+            <h3 id="labor-title">👨‍🍳 Labor & Profit</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label id="work-time-label">Work Time (minutes)</label>
+                    <input type="number" id="work-time" value="60">
+                </div>
+                <div class="form-group">
+                    <label id="hourly-rate-label">Hourly Rate (฿/hour)</label>
+                    <input type="number" id="hourly-rate" value="100">
+                </div>
+            </div>
+            <div class="form-group">
+                <label id="margin-label">Profit Margin (%)</label>
+                <input type="number" id="margin" value="45">
+            </div>
+        </div>
+        
+        <!-- Results -->
+        <div class="results" id="results" style="display: none;">
+            <h3 id="results-title">📊 Calculation Results</h3>
+            <div class="result-grid">
+                <div class="result-item">
+                    <div class="result-value" id="total-cost">฿0.00</div>
+                    <div class="result-label" id="total-cost-label">Total Cost</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-value" id="cost-per-cake">฿0.00</div>
+                    <div class="result-label" id="cost-per-cake-label">Cost per Cake</div>
+                </div>
+                <div class="result-item highlight">
+                    <div class="result-value" id="selling-price">฿0.00</div>
+                    <div class="result-label" id="selling-price-label">Recommended Selling Price</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        const CakeCostCalculator = () => {
-            const [isDark, setIsDark] = useState(false);
-            const [language, setLanguage] = useState('en');
-            const [recipes, setRecipes] = useState([]);
-            const [editingRecipeId, setEditingRecipeId] = useState(null);
-            const [editingIngredient, setEditingIngredient] = useState(null);
-            const [currentRecipe, setCurrentRecipe] = useState({
-                name: '',
-                cakeQuantity: 1,
-                ingredients: [],
-                margin: 45,
-                laborMinutes: '',
-                laborCostPerHour: 100,
-                packagingCostPerBag: '',
-                packagingPerBag: '',
-                mixerKwh: '',
-                mixerElectricityCost: '',
-                mixerUsageMinutes: '',
-                ovenKwh: '',
-                ovenElectricityCost: '',
-                ovenUsageMinutes: ''
-            });
-            const [newIngredient, setNewIngredient] = useState({
-                name: '',
-                quantity: '',
-                unit: 'g',
-                pricePerUnit: ''
-            });
-
-            const translations = {
-                en: {
-                    title: "Cake Cost Calculator",
-                    subtitle: "Easily calculate the cost price and selling price of your creations",
-                    newRecipe: "New Recipe",
-                    cakeName: "Cake name",
-                    cakeNamePlaceholder: "Ex: Chocolate cake",
-                    cakeQuantity: "Number of cakes",
-                    addIngredient: "Add ingredient",
-                    ingredientName: "Ingredient name",
-                    quantity: "Total quantity",
-                    pricePerUnit: "Price per kg/liter (฿)",
-                    add: "Add",
-                    addedIngredients: "Added ingredients",
-                    laborCosts: "Labor costs",
-                    laborMinutes: "Working minutes",
-                    laborRate: "Hourly rate (฿/h)",
-                    additionalCosts: "Additional costs",
-                    packaging: "Packaging",
-                    packagingCostPerBag: "Cost per bag (฿)",
-                    packagingPerBag: "Packages per bag",
-                    packagingCostPerUnit: "Cost per package:",
-                    equipment: "Equipment",
-                    mixer: "Dough mixer",
-                    oven: "Oven",
-                    kwh: "kW/h",
-                    electricityCost: "Electricity cost (฿/kWh)",
-                    usageMinutes: "Usage minutes",
-                    margin: "Profit margin (%)",
-                    ingredientsCost: "Ingredients cost:",
-                    laborCost: "Labor cost:",
-                    packagingCost: "Packaging:",
-                    mixerCost: "Mixer:",
-                    ovenCost: "Oven:",
-                    totalCost: "Total cost price:",
-                    costPerCake: "Cost per cake:",
-                    sellingPrice: "Selling price per cake:",
-                    saveRecipe: "Save recipe",
-                    updateRecipe: "Update recipe",
-                    myRecipes: "My Recipes",
-                    noRecipes: "No saved recipes",
-                    firstRecipe: "Create your first recipe to get started!",
-                    ingredients: "ingredients",
-                    cakes: "cakes",
-                    cost: "Cost:",
-                    sale: "Sale:",
-                    marginLabel: "Margin:",
-                    modify: "Edit",
-                    delete: "Delete",
-                    minutes: "min",
-                    cancel: "Cancel",
-                    baseInfo: "Basic Information",
-                    update: "Update"
-                },
-                th: {
-                    title: "เครื่องคำนวณต้นทุนเค้ก",
-                    subtitle: "คำนวณต้นทุนและราคาขายของผลงานของคุณได้อย่างง่ายดาย",
-                    newRecipe: "สูตรใหม่",
-                    cakeName: "ชื่อเค้ก",
-                    cakeNamePlaceholder: "เช่น: เค้กช็อกโกแลต",
-                    cakeQuantity: "จำนวนเค้ก",
-                    addIngredient: "เพิ่มวัตถุดิบ",
-                    ingredientName: "ชื่อวัตถุดิบ",
-                    quantity: "ปริมาณรวม",
-                    pricePerUnit: "ราคาต่อกิโลกรัม/ลิตร (฿)",
-                    add: "เพิ่ม",
-                    addedIngredients: "วัตถุดิบที่เพิ่มแล้ว",
-                    laborCosts: "ต้นทุนแรงงาน",
-                    laborMinutes: "นาทีทำงาน",
-                    laborRate: "อัตราค่าจ้างต่อชั่วโมง (฿/ชม.)",
-                    additionalCosts: "ต้นทุนเพิ่มเติม",
-                    packaging: "บรรจุภัณฑ์",
-                    packagingCostPerBag: "ต้นทุนต่อถุง (฿)",
-                    packagingPerBag: "จำนวนห่อต่อถุง",
-                    packagingCostPerUnit: "ต้นทุนต่อห่อ:",
-                    equipment: "อุปกรณ์",
-                    mixer: "เครื่องผสมแป้ง",
-                    oven: "เตาอบ",
-                    kwh: "กิโลวัตต์/ชม.",
-                    electricityCost: "ต้นทุนไฟฟ้า (฿/กิโลวัตต์ชม.)",
-                    usageMinutes: "นาทีการใช้งาน",
-                    margin: "กำไรส่วนเพิ่ม (%)",
-                    ingredientsCost: "ต้นทุนวัตถุดิบ:",
-                    laborCost: "ต้นทุนแรงงาน:",
-                    packagingCost: "บรรจุภัณฑ์:",
-                    mixerCost: "เครื่องผสม:",
-                    ovenCost: "เตาอบ:",
-                    totalCost: "ต้นทุนรวมทั้งหมด:",
-                    costPerCake: "ต้นทุนต่อชิ้น:",
-                    sellingPrice: "ราคาขายต่อชิ้น:",
-                    saveRecipe: "บันทึกสูตร",
-                    updateRecipe: "อัปเดตสูตร",
-                    myRecipes: "สูตรของฉัน",
-                    noRecipes: "ไม่มีสูตรที่บันทึกไว้",
-                    firstRecipe: "สร้างสูตรแรกของคุณเพื่อเริ่มต้น!",
-                    ingredients: "วัตถุดิบ",
-                    cakes: "เค้ก",
-                    cost: "ต้นทุน:",
-                    sale: "ขาย:",
-                    marginLabel: "กำไร:",
-                    modify: "แก้ไข",
-                    delete: "ลบ",
-                    minutes: "นาที",
-                    cancel: "ยกเลิก",
-                    baseInfo: "ข้อมูลพื้นฐาน",
-                    update: "อัปเดต"
-                }
-            };
-
-            const t = translations[language];
-
-            // Toutes les fonctions de calcul et de gestion
-            const editIngredient = (ingredient) => {
-                setEditingIngredient(ingredient.id);
-                setNewIngredient({
-                    name: ingredient.name,
-                    quantity: ingredient.quantity.toString(),
-                    unit: ingredient.unit,
-                    pricePerUnit: ingredient.pricePerUnit.toString()
-                });
-            };
-
-            const cancelEditIngredient = () => {
-                setEditingIngredient(null);
-                setNewIngredient({ name: '', quantity: '', unit: 'g', pricePerUnit: '' });
-            };
-
-            const addIngredient = () => {
-                if (newIngredient.name && newIngredient.quantity && newIngredient.pricePerUnit) {
-                    if (editingIngredient) {
-                        setCurrentRecipe(prev => ({
-                            ...prev,
-                            ingredients: prev.ingredients.map(ing => 
-                                ing.id === editingIngredient 
-                                    ? {
-                                        ...ing,
-                                        name: newIngredient.name,
-                                        quantity: parseFloat(newIngredient.quantity),
-                                        unit: newIngredient.unit,
-                                        pricePerUnit: parseFloat(newIngredient.pricePerUnit)
-                                    }
-                                    : ing
-                            )
-                        }));
-                        setEditingIngredient(null);
-                    } else {
-                        setCurrentRecipe(prev => ({
-                            ...prev,
-                            ingredients: [...prev.ingredients, { 
-                                ...newIngredient, 
-                                id: Date.now(),
-                                quantity: parseFloat(newIngredient.quantity),
-                                pricePerUnit: parseFloat(newIngredient.pricePerUnit)
-                            }]
-                        }));
-                    }
-                    setNewIngredient({ name: '', quantity: '', unit: 'g', pricePerUnit: '' });
-                }
-            };
-
-            const removeIngredient = (id) => {
-                setCurrentRecipe(prev => ({
-                    ...prev,
-                    ingredients: prev.ingredients.filter(ing => ing.id !== id)
-                }));
-            };
-
-            const calculateIngredientsCost = () => {
-                return currentRecipe.ingredients.reduce((total, ingredient) => {
-                    const cost = (ingredient.quantity * ingredient.pricePerUnit) / (ingredient.unit === 'g' || ingredient.unit === 'ml' ? 1000 : 1);
-                    return total + cost;
-                }, 0);
-            };
-
-            const calculateLaborCost = () => {
-                const minutes = parseFloat(currentRecipe.laborMinutes) || 0;
-                const hours = minutes / 60;
-                return hours * currentRecipe.laborCostPerHour;
-            };
-
-            const calculatePackagingCost = () => {
-                const costPerBag = parseFloat(currentRecipe.packagingCostPerBag) || 0;
-                const perBag = parseFloat(currentRecipe.packagingPerBag) || 1;
-                if (perBag === 0) return 0;
-                const costPerPackage = costPerBag / perBag;
-                return costPerPackage * currentRecipe.cakeQuantity;
-            };
-
-            const calculateMixerCost = () => {
-                const minutes = parseFloat(currentRecipe.mixerUsageMinutes) || 0;
-                const kwh = parseFloat(currentRecipe.mixerKwh) || 0;
-                const electricityCost = parseFloat(currentRecipe.mixerElectricityCost) || 0;
-                const hours = minutes / 60;
-                return kwh * electricityCost * hours;
-            };
-
-            const calculateOvenCost = () => {
-                const minutes = parseFloat(currentRecipe.ovenUsageMinutes) || 0;
-                const kwh = parseFloat(currentRecipe.ovenKwh) || 0;
-                const electricityCost = parseFloat(currentRecipe.ovenElectricityCost) || 0;
-                const hours = minutes / 60;
-                return kwh * electricityCost * hours;
-            };
-
-            const calculateTotalCost = () => {
-                return calculateIngredientsCost() + calculateLaborCost() + calculatePackagingCost() + 
-                       calculateMixerCost() + calculateOvenCost();
-            };
-
-            const calculateCostPerCake = () => {
-                return calculateTotalCost() / currentRecipe.cakeQuantity;
-            };
-
-            const calculateSellingPricePerCake = () => {
-                const costPerCake = calculateCostPerCake();
-                return costPerCake * (1 + currentRecipe.margin / 100);
-            };
-
-            const saveRecipe = () => {
-                if (currentRecipe.name && currentRecipe.ingredients.length > 0) {
-                    const recipeData = { 
-                        ...currentRecipe,
-                        id: editingRecipeId || Date.now(),
-                        ingredientsCost: calculateIngredientsCost(),
-                        laborCost: calculateLaborCost(),
-                        packagingCost: calculatePackagingCost(),
-                        mixerCost: calculateMixerCost(),
-                        ovenCost: calculateOvenCost(),
-                        totalCost: calculateTotalCost(),
-                        costPerCake: calculateCostPerCake(),
-                        sellingPricePerCake: calculateSellingPricePerCake(),
-                        createdAt: new Date().toLocaleDateString()
-                    };
-
-                    if (editingRecipeId) {
-                        setRecipes(prev => prev.map(recipe => 
-                            recipe.id === editingRecipeId ? recipeData : recipe
-                        ));
-                        setEditingRecipeId(null);
-                    } else {
-                        setRecipes(prev => [...prev, recipeData]);
-                    }
-
-                    resetForm();
-                }
-            };
-
-            const resetForm = () => {
-                setCurrentRecipe({ 
-                    name: '', 
-                    cakeQuantity: 1,
-                    ingredients: [], 
-                    margin: 45, 
-                    laborMinutes: '',
-                    laborCostPerHour: 100,
-                    packagingCostPerBag: '',
-                    packagingPerBag: '',
-                    mixerKwh: '',
-                    mixerElectricityCost: '',
-                    mixerUsageMinutes: '',
-                    ovenKwh: '',
-                    ovenElectricityCost: '',
-                    ovenUsageMinutes: ''
-                });
-                setEditingIngredient(null);
-            };
-
-            const loadRecipe = (recipe) => {
-                setCurrentRecipe({
-                    name: recipe.name,
-                    cakeQuantity: recipe.cakeQuantity,
-                    ingredients: recipe.ingredients,
-                    margin: recipe.margin,
-                    laborMinutes: recipe.laborMinutes,
-                    laborCostPerHour: recipe.laborCostPerHour,
-                    packagingCostPerBag: recipe.packagingCostPerBag,
-                    packagingPerBag: recipe.packagingPerBag,
-                    mixerKwh: recipe.mixerKwh,
-                    mixerElectricityCost: recipe.mixerElectricityCost,
-                    mixerUsageMinutes: recipe.mixerUsageMinutes,
-                    ovenKwh: recipe.ovenKwh,
-                    ovenElectricityCost: recipe.ovenElectricityCost,
-                    ovenUsageMinutes: recipe.ovenUsageMinutes
-                });
-                setEditingRecipeId(recipe.id);
-                setEditingIngredient(null);
-            };
-
-            const cancelEdit = () => {
-                setEditingRecipeId(null);
-                resetForm();
-            };
-
-            const deleteRecipe = (id) => {
-                setRecipes(prev => prev.filter(recipe => recipe.id !== id));
-            };
-
-            const themeClasses = isDark ? 'dark bg-gray-900' : 'bg-gradient-to-br from-pink-50 to-orange-50';
-            const cardClasses = isDark ? 'bg-gray-800 text-white' : 'bg-white';
-            const inputClasses = isDark 
-                ? 'bg-gray-700 border-gray-500 text-white placeholder-gray-300 focus:ring-pink-500 focus:border-pink-500' 
-                : 'border-gray-300 focus:ring-pink-500 focus:border-transparent';
-
-            return React.createElement('div', {
-                className: `min-h-screen p-2 sm:p-4 transition-colors duration-300 ${themeClasses}`
-            }, 
-                React.createElement('div', { className: 'max-w-7xl mx-auto' },
-                    // Header
-                    React.createElement('div', { className: 'flex flex-col sm:flex-row justify-between items-center mb-6 sm:mb-8 gap-4' },
-                        React.createElement('div', { className: 'text-center flex-1' },
-                            React.createElement('div', { className: 'flex items-center justify-center gap-3 mb-4' },
-                                React.createElement(ChefHat, { className: `w-6 sm:w-8 h-6 sm:h-8 ${isDark ? 'text-pink-400' : 'text-pink-600'}` }),
-                                React.createElement('h1', { className: `text-2xl sm:text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-800'}` }, t.title)
-                            ),
-                            React.createElement('p', { className: `text-sm sm:text-base ${isDark ? 'text-gray-300' : 'text-gray-600'}` }, t.subtitle)
-                        ),
-                        React.createElement('div', { className: 'flex items-center gap-4' },
-                            React.createElement('div', { className: 'flex items-center gap-2' },
-                                React.createElement(Globe, { className: `w-4 sm:w-5 h-4 sm:h-5 ${isDark ? 'text-gray-300' : 'text-gray-600'}` }),
-                                React.createElement('select', {
-                                    value: language,
-                                    onChange: (e) => setLanguage(e.target.value),
-                                    className: `px-2 sm:px-3 py-1 sm:py-2 rounded-lg text-sm ${inputClasses}`
-                                },
-                                    React.createElement('option', { value: 'en' }, '🇬🇧 English'),
-                                    React.createElement('option', { value: 'th' }, '🇹🇭 ไทย')
-                                )
-                            ),
-                            React.createElement('button', {
-                                onClick: () => setIsDark(!isDark),
-                                className: `p-2 rounded-lg shadow-lg hover:scale-110 transition-all ${isDark ? 'bg-gray-700 text-yellow-400' : 'bg-white text-gray-600'}`
-                            },
-                                isDark ? React.createElement(Sun, { className: 'w-4 sm:w-5 h-4 sm:h-5' }) : React.createElement(Moon, { className: 'w-4 sm:w-5 h-4 sm:h-5' })
-                            )
-                        )
-                    ),
-                    // Rest of the component would continue here...
-                    React.createElement('div', { className: 'text-center mt-8 p-4 bg-blue-100 dark:bg-blue-900 rounded-lg' },
-                        React.createElement('p', { className: 'text-blue-800 dark:text-blue-200' }, 
-                            '🍰 Professional Cake Cost Calculator - Made with ❤️ for Thai Bakeries'
-                        )
-                    )
-                )
-            );
+    <script>
+        let currentLang = 'en';
+        let ingredients = [];
+        
+        const translations = {
+            en: {
+                title: '🍰 Cake Cost Calculator',
+                subtitle: 'Professional calculator for Thai bakeries',
+                basicInfo: '📋 Basic Information',
+                cakeNameLabel: 'Cake Name',
+                cakeQuantityLabel: 'Number of Cakes',
+                ingredientsTitle: '🥚 Ingredients',
+                laborTitle: '👨‍🍳 Labor & Profit',
+                workTimeLabel: 'Work Time (minutes)',
+                hourlyRateLabel: 'Hourly Rate (฿/hour)',
+                marginLabel: 'Profit Margin (%)',
+                addBtn: 'Add',
+                resultsTitle: '📊 Calculation Results',
+                totalCostLabel: 'Total Cost',
+                costPerCakeLabel: 'Cost per Cake',
+                sellingPriceLabel: 'Recommended Selling Price',
+                remove: 'Remove'
+            },
+            th: {
+                title: '🍰 เครื่องคำนวณต้นทุนเค้ก',
+                subtitle: 'เครื่องคำนวณสำหรับเบเกอรี่ไทย',
+                basicInfo: '📋 ข้อมูลพื้นฐาน',
+                cakeNameLabel: 'ชื่อเค้ก',
+                cakeQuantityLabel: 'จำนวนเค้ก',
+                ingredientsTitle: '🥚 วัตถุดิบ',
+                laborTitle: '👨‍🍳 แรงงานและกำไร',
+                workTimeLabel: 'เวลาทำงาน (นาที)',
+                hourlyRateLabel: 'อัตราค่าจ้าง (฿/ชั่วโมง)',
+                marginLabel: 'กำไร (%)',
+                addBtn: 'เพิ่ม',
+                resultsTitle: '📊 ผลการคำนวณ',
+                totalCostLabel: 'ต้นทุนรวม',
+                costPerCakeLabel: 'ต้นทุนต่อชิ้น',
+                sellingPriceLabel: 'ราคาขายแนะนำ',
+                remove: 'ลบ'
+            }
         };
-
-        // Render the app
-        ReactDOM.render(React.createElement(CakeCostCalculator), document.getElementById('root'));
+        
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'th' : 'en';
+            updateLanguage();
+        }
+        
+        function updateLanguage() {
+            const t = translations[currentLang];
+            document.getElementById('title').textContent = t.title;
+            document.getElementById('subtitle').textContent = t.subtitle;
+            document.getElementById('basic-info').textContent = t.basicInfo;
+            document.getElementById('cake-name-label').textContent = t.cakeNameLabel;
+            document.getElementById('cake-quantity-label').textContent = t.cakeQuantityLabel;
+            document.getElementById('ingredients-title').textContent = t.ingredientsTitle;
+            document.getElementById('labor-title').textContent = t.laborTitle;
+            document.getElementById('work-time-label').textContent = t.workTimeLabel;
+            document.getElementById('hourly-rate-label').textContent = t.hourlyRateLabel;
+            document.getElementById('margin-label').textContent = t.marginLabel;
+            document.getElementById('add-btn').textContent = t.addBtn;
+            document.getElementById('results-title').textContent = t.resultsTitle;
+            document.getElementById('total-cost-label').textContent = t.totalCostLabel;
+            document.getElementById('cost-per-cake-label').textContent = t.costPerCakeLabel;
+            document.getElementById('selling-price-label').textContent = t.sellingPriceLabel;
+        }
+        
+        function addIngredient() {
+            const name = document.getElementById('ingredient-name').value;
+            const quantity = parseFloat(document.getElementById('ingredient-quantity').value);
+            const price = parseFloat(document.getElementById('ingredient-price').value);
+            
+            if (name && quantity && price) {
+                ingredients.push({
+                    id: Date.now(),
+                    name: name,
+                    quantity: quantity,
+                    price: price
+                });
+                
+                updateIngredientsList();
+                calculateCosts();
+                
+                // Clear inputs
+                document.getElementById('ingredient-name').value = '';
+                document.getElementById('ingredient-quantity').value = '';
+                document.getElementById('ingredient-price').value = '';
+            }
+        }
+        
+        function removeIngredient(id) {
+            ingredients = ingredients.filter(ing => ing.id !== id);
+            updateIngredientsList();
+            calculateCosts();
+        }
+        
+        function updateIngredientsList() {
+            const list = document.getElementById('ingredients-list');
+            const t = translations[currentLang];
+            
+            list.innerHTML = ingredients.map(ing => `
+                <div class="ingredient-item">
+                    <span>${ing.name} - ${ing.quantity}g - ฿${ing.price}/kg</span>
+                    <button class="btn btn-small btn-danger" onclick="removeIngredient(${ing.id})">${t.remove}</button>
+                </div>
+            `).join('');
+        }
+        
+        function calculateCosts() {
+            if (ingredients.length === 0) {
+                document.getElementById('results').style.display = 'none';
+                return;
+            }
+            
+            const cakeQuantity = parseInt(document.getElementById('cake-quantity').value) || 1;
+            const workTime = parseInt(document.getElementById('work-time').value) || 0;
+            const hourlyRate = parseInt(document.getElementById('hourly-rate').value) || 0;
+            const margin = parseInt(document.getElementById('margin').value) || 0;
+            
+            // Calculate ingredients cost
+            const ingredientsCost = ingredients.reduce((total, ing) => {
+                return total + (ing.quantity * ing.price / 1000);
+            }, 0);
+            
+            // Calculate labor cost
+            const laborCost = (workTime / 60) * hourlyRate;
+            
+            // Total cost
+            const totalCost = ingredientsCost + laborCost;
+            
+            // Cost per cake
+            const costPerCake = totalCost / cakeQuantity;
+            
+            // Selling price
+            const sellingPrice = costPerCake * (1 + margin / 100);
+            
+            // Update results
+            document.getElementById('total-cost').textContent = `฿${totalCost.toFixed(2)}`;
+            document.getElementById('cost-per-cake').textContent = `฿${costPerCake.toFixed(2)}`;
+            document.getElementById('selling-price').textContent = `฿${sellingPrice.toFixed(2)}`;
+            
+            document.getElementById('results').style.display = 'block';
+        }
+        
+        // Auto-calculate when inputs change
+        document.addEventListener('input', calculateCosts);
+        
+        // Initialize
+        updateLanguage();
     </script>
 </body>
 </html>
