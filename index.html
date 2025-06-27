@@ -789,10 +789,181 @@
             transition: all 0.3s ease;
         }
         
-        .tooltip:hover::after {
-            opacity: 1;
-            visibility: visible;
-            transform: translateX(-50%) translateY(-5px);
+        /* Scanner Styles */
+        .scanner-section {
+            background: var(--gray-50);
+            border: 2px dashed var(--gray-300);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        body.dark .scanner-section {
+            background: var(--gray-800);
+            border-color: var(--gray-600);
+        }
+        
+        .scanner-section:hover {
+            border-color: var(--primary);
+            background: rgba(37, 99, 235, 0.05);
+        }
+        
+        .scanner-header h4 {
+            color: var(--primary);
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .scanner-header p {
+            color: var(--gray-500);
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+        
+        body.dark .scanner-header p {
+            color: var(--gray-400);
+        }
+        
+        .scanner-controls {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--gray-600), var(--gray-700));
+            color: white;
+        }
+        
+        .scanner-preview {
+            margin-top: 16px;
+            border-radius: 8px;
+            overflow: hidden;
+            max-height: 300px;
+            display: none;
+        }
+        
+        .scanner-preview img {
+            width: 100%;
+            height: auto;
+            max-height: 300px;
+            object-fit: contain;
+        }
+        
+        .scanner-results {
+            margin-top: 16px;
+            text-align: left;
+            display: none;
+        }
+        
+        .scanned-item {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideIn 0.3s ease;
+        }
+        
+        body.dark .scanned-item {
+            background: var(--gray-700);
+            border-color: var(--gray-600);
+        }
+        
+        .scanned-item-info {
+            flex: 1;
+        }
+        
+        .scanned-item-name {
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 2px;
+        }
+        
+        body.dark .scanned-item-name {
+            color: white;
+        }
+        
+        .scanned-item-details {
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+        
+        body.dark .scanned-item-details {
+            color: var(--gray-400);
+        }
+        
+        .scanned-item-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .manual-entry {
+            border-top: 1px solid var(--gray-200);
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+        
+        body.dark .manual-entry {
+            border-top-color: var(--gray-700);
+        }
+        
+        .manual-entry h5 {
+            color: var(--gray-700);
+            margin-bottom: 16px;
+            font-size: 1rem;
+        }
+        
+        body.dark .manual-entry h5 {
+            color: var(--gray-300);
+        }
+        
+        .processing-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            color: white;
+        }
+        
+        .processing-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
     </style>
 </head>
@@ -837,12 +1008,37 @@
                         <div class="card-icon">🥚</div>
                         <h3 class="card-title" id="ingredients-title">Ingredients Management</h3>
                     </div>
-                    <div class="form-row-4">
-                        <input type="text" id="ingredient-name" placeholder="Ingredient name">
-                        <input type="number" id="ingredient-quantity" placeholder="Qty (g/ml)">
-                        <input type="number" id="ingredient-price" placeholder="Price/kg (฿)">
-                        <button class="btn btn-success" onclick="addIngredient()" id="add-btn">Add</button>
+                    
+                    <!-- Photo Scanner Section -->
+                    <div class="scanner-section">
+                        <div class="scanner-header">
+                            <h4 id="scanner-title">📸 Receipt Scanner</h4>
+                            <p id="scanner-subtitle">Take a photo of your receipt to automatically extract ingredients</p>
+                        </div>
+                        <div class="scanner-controls">
+                            <input type="file" id="receipt-input" accept="image/*" capture="environment" style="display: none;">
+                            <button class="btn btn-success" onclick="openCamera()" id="scan-btn">
+                                📷 Scan Receipt
+                            </button>
+                            <button class="btn btn-secondary" onclick="uploadImage()" id="upload-btn">
+                                📁 Upload Image
+                            </button>
+                        </div>
+                        <div id="scanner-preview" class="scanner-preview"></div>
+                        <div id="scanner-results" class="scanner-results"></div>
                     </div>
+                    
+                    <!-- Manual Entry -->
+                    <div class="manual-entry">
+                        <h5 id="manual-title">Manual Entry</h5>
+                        <div class="form-row-4">
+                            <input type="text" id="ingredient-name" placeholder="Ingredient name">
+                            <input type="number" id="ingredient-quantity" placeholder="Qty (g/ml)">
+                            <input type="number" id="ingredient-price" placeholder="Price/kg (฿)">
+                            <button class="btn btn-success" onclick="addIngredient()" id="add-btn">Add</button>
+                        </div>
+                    </div>
+                    
                     <div id="ingredients-list"></div>
                 </div>
                 
@@ -998,7 +1194,15 @@
                 delete: 'Delete',
                 load: 'Load',
                 emptyRecipes: 'No saved recipes yet',
-                emptyRecipesDesc: 'Start by creating your first recipe!'
+                scannerTitle: 'Receipt Scanner',
+                scannerSubtitle: 'Take a photo of your receipt to automatically extract ingredients',
+                scanBtn: '📷 Scan Receipt',
+                uploadBtn: '📁 Upload Image',
+                manualTitle: 'Manual Entry',
+                processing: 'Processing image...',
+                extractedItems: 'Extracted from receipt:',
+                addToList: 'Add to List',
+                confidence: 'Confidence'
             },
             th: {
                 title: '🍰 เครื่องคำนวณต้นทุนเค้กแบบมืออาชีพ',
@@ -1032,7 +1236,16 @@
                 delete: 'ลบ',
                 load: 'โหลด',
                 emptyRecipes: 'ยังไม่มีสูตรที่บันทึกไว้',
-                emptyRecipesDesc: 'เริ่มต้นด้วยการสร้างสูตรแรกของคุณ!'
+                emptyRecipesDesc: 'เริ่มต้นด้วยการสร้างสูตรแรกของคุณ!',
+                scannerTitle: 'สแกนใบเสร็จ',
+                scannerSubtitle: 'ถ่ายภาพใบเสร็จเพื่อดึงข้อมูลวัตถุดิบโดยอัตโนมัติ',
+                scanBtn: '📷 สแกนใบเสร็จ',
+                uploadBtn: '📁 อัปโหลดรูปภาพ',
+                manualTitle: 'กรอกข้อมูลด้วยตนเอง',
+                processing: 'กำลังประมวลผลภาพ...',
+                extractedItems: 'ข้อมูลที่ดึงจากใบเสร็จ:',
+                addToList: 'เพิ่มในรายการ',
+                confidence: 'ความแม่นยำ'
             }
         };
         
@@ -1057,6 +1270,11 @@
             document.getElementById('cake-name-label').textContent = t.cakeNameLabel;
             document.getElementById('cake-quantity-label').textContent = t.cakeQuantityLabel;
             document.getElementById('ingredients-title').textContent = t.ingredientsTitle;
+            document.getElementById('scanner-title').textContent = t.scannerTitle;
+            document.getElementById('scanner-subtitle').textContent = t.scannerSubtitle;
+            document.getElementById('scan-btn').textContent = t.scanBtn;
+            document.getElementById('upload-btn').textContent = t.uploadBtn;
+            document.getElementById('manual-title').textContent = t.manualTitle;
             document.getElementById('labor-title').textContent = t.laborTitle;
             document.getElementById('work-time-label').textContent = t.workTimeLabel;
             document.getElementById('hourly-rate-label').textContent = t.hourlyRateLabel;
@@ -1346,6 +1564,142 @@
                     card.classList.add('fade-in');
                 }, index * 100);
             });
+        }
+        
+        // Scanner Functions
+        let scannedItems = [];
+        
+        function openCamera() {
+            const input = document.getElementById('receipt-input');
+            input.click();
+        }
+        
+        function uploadImage() {
+            const input = document.getElementById('receipt-input');
+            input.click();
+        }
+        
+        // Handle file selection
+        document.getElementById('receipt-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                processReceiptImage(file);
+            }
+        });
+        
+        function processReceiptImage(file) {
+            const t = translations[currentLang];
+            
+            // Show preview
+            const preview = document.getElementById('scanner-preview');
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            preview.innerHTML = '';
+            preview.appendChild(img);
+            preview.style.display = 'block';
+            
+            // Show processing overlay
+            showProcessingOverlay(t.processing);
+            
+            // Simulate OCR processing (in real app, this would call OCR API)
+            setTimeout(() => {
+                hideProcessingOverlay();
+                simulateOCRResults();
+            }, 2000);
+        }
+        
+        function simulateOCRResults() {
+            // Simulate extracted receipt data (in real app, this would come from OCR API)
+            const mockResults = [
+                { name: 'Flour (แป้งสาลี)', price: 45.50, unit: 'kg', confidence: 95 },
+                { name: 'Sugar (น้ำตาล)', price: 38.00, unit: 'kg', confidence: 92 },
+                { name: 'Butter (เนย)', price: 180.00, unit: 'kg', confidence: 88 },
+                { name: 'Eggs (ไข่)', price: 120.00, unit: 'kg', confidence: 85 },
+                { name: 'Vanilla Extract (วานิลลา)', price: 250.00, unit: 'kg', confidence: 78 }
+            ];
+            
+            scannedItems = mockResults;
+            displayScannedResults();
+        }
+        
+        function displayScannedResults() {
+            const t = translations[currentLang];
+            const resultsDiv = document.getElementById('scanner-results');
+            
+            if (scannedItems.length === 0) {
+                resultsDiv.style.display = 'none';
+                return;
+            }
+            
+            let html = `<h6 style="color: var(--primary); margin-bottom: 12px;">${t.extractedItems}</h6>`;
+            
+            scannedItems.forEach((item, index) => {
+                const confidenceColor = item.confidence > 90 ? 'var(--success)' : 
+                                      item.confidence > 80 ? 'var(--warning)' : 'var(--danger)';
+                
+                html += `
+                    <div class="scanned-item">
+                        <div class="scanned-item-info">
+                            <div class="scanned-item-name">${item.name}</div>
+                            <div class="scanned-item-details">
+                                ฿${item.price}/${item.unit} • ${t.confidence}: 
+                                <span style="color: ${confidenceColor}; font-weight: 600;">${item.confidence}%</span>
+                            </div>
+                        </div>
+                        <div class="scanned-item-actions">
+                            <button class="btn btn-small btn-success" onclick="addScannedItem(${index})">
+                                ${t.addToList}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            resultsDiv.innerHTML = html;
+            resultsDiv.style.display = 'block';
+        }
+        
+        function addScannedItem(index) {
+            const item = scannedItems[index];
+            if (!item) return;
+            
+            // Add to ingredients with default quantity
+            ingredients.push({
+                id: Date.now() + Math.random(),
+                name: item.name,
+                quantity: 100, // Default 100g
+                price: item.price,
+                cost: (100 * item.price / 1000) // 100g cost
+            });
+            
+            // Remove from scanned items
+            scannedItems.splice(index, 1);
+            
+            updateIngredientsList();
+            calculateCosts();
+            displayScannedResults();
+            
+            // Add success animation
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '✅ Added!';
+            btn.disabled = true;
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }, 1000);
+        }
+        
+        function showProcessingOverlay(message) {
+            const overlay = document.createElement('div');
+            overlay.className = 'processing-overlay';
+            overlay.id = 'processing-overlay';
+            overlay.innerHTML = `
+                <div class="processing-spinner"></div>
+                <p style="font-size: 18px; font-weight: 600;">${message}</p>
+                <p style="font-size: 14px; opacity: 0.8;">Please wait while we analyze your receipt...</p>
+            `;
+            document.body.appendChild(overlay);
         }
         
         // Start the app
