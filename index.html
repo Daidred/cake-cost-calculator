@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🍰 Cake Cost Calculator</title>
+    <title>🍰 Professional Cake Cost Calculator | Thai Bakery Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -11,314 +12,883 @@
             box-sizing: border-box;
         }
         
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #f59e0b;
+            --accent: #ec4899;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #1f2937;
+            --light: #f8fafc;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
+            line-height: 1.6;
+            color: var(--gray-800);
+        }
+        
+        body.dark {
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            color: white;
         }
         
         .container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            padding: 30px;
+            padding: 20px;
         }
         
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: var(--shadow-xl);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent), var(--secondary));
+        }
+        
+        body.dark .header {
+            background: rgba(31, 41, 55, 0.95);
+            color: white;
         }
         
         .header h1 {
-            color: #e91e63;
-            font-size: 2.5em;
-            margin-bottom: 10px;
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+            line-height: 1.2;
         }
         
         .header p {
-            color: #666;
-            font-size: 1.1em;
+            font-size: 1.25rem;
+            color: var(--gray-600);
+            max-width: 600px;
+            margin: 0 auto;
         }
         
-        .language-switch {
+        body.dark .header p {
+            color: var(--gray-300);
+        }
+        
+        .controls {
             position: absolute;
             top: 20px;
             right: 20px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .language-switch, .theme-toggle {
             background: white;
-            border: 2px solid #e91e63;
-            border-radius: 25px;
-            padding: 5px 15px;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 8px 16px;
             cursor: pointer;
-            font-weight: bold;
-            color: #e91e63;
+            font-weight: 600;
+            color: var(--primary);
+            transition: all 0.3s ease;
+            font-size: 14px;
         }
         
-        .section {
-            background: #f9f9f9;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
+        body.dark .language-switch, body.dark .theme-toggle {
+            background: var(--gray-800);
+            color: white;
+            border-color: var(--primary);
         }
         
-        .section h3 {
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 1.3em;
+        .language-switch:hover, .theme-toggle:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
         
-        .form-group {
-            margin-bottom: 15px;
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+        }
+        
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        body.dark .card {
+            background: rgba(31, 41, 55, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--gray-100);
+        }
+        
+        body.dark .card-header {
+            border-bottom-color: var(--gray-700);
+        }
+        
+        .card-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+        
+        body.dark .card-title {
+            color: white;
         }
         
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 15px;
+            gap: 20px;
+            margin-bottom: 20px;
         }
         
         .form-row-3 {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr 80px;
-            gap: 10px;
-            margin-bottom: 15px;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .form-row-4 {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 100px;
+            gap: 12px;
+            margin-bottom: 16px;
+            align-items: end;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row, .form-row-3, .form-row-4 {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
         }
         
         label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #333;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--gray-700);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        body.dark label {
+            color: var(--gray-300);
         }
         
         input, select {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
+            padding: 12px 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
             font-size: 16px;
-            transition: border-color 0.3s;
+            transition: all 0.3s ease;
+            background: white;
+            color: var(--gray-800);
+        }
+        
+        body.dark input, body.dark select {
+            background: var(--gray-700);
+            border-color: var(--gray-600);
+            color: white;
         }
         
         input:focus, select:focus {
             outline: none;
-            border-color: #e91e63;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            transform: translateY(-2px);
         }
         
         .btn {
-            background: #e91e63;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
+            padding: 14px 24px;
+            border-radius: 12px;
             cursor: pointer;
             font-size: 16px;
-            font-weight: bold;
-            transition: background 0.3s;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: var(--shadow);
         }
         
         .btn:hover {
-            background: #c2185b;
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
         }
         
-        .btn-small {
-            padding: 8px 12px;
-            font-size: 14px;
+        .btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #059669);
         }
         
         .btn-danger {
-            background: #f44336;
+            background: linear-gradient(135deg, var(--danger), #dc2626);
         }
         
-        .btn-danger:hover {
-            background: #d32f2f;
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning), #d97706);
+        }
+        
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 14px;
         }
         
         .ingredient-item {
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 10px;
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: all 0.3s ease;
         }
         
-        .results {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        body.dark .ingredient-item {
+            background: var(--gray-700);
+            border-color: var(--gray-600);
+        }
+        
+        .ingredient-item:hover {
+            transform: translateX(5px);
+            border-color: var(--primary);
+        }
+        
+        .ingredient-info {
+            flex: 1;
+        }
+        
+        .ingredient-name {
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 4px;
+        }
+        
+        body.dark .ingredient-name {
             color: white;
-            border-radius: 15px;
-            padding: 25px;
+        }
+        
+        .ingredient-details {
+            font-size: 14px;
+            color: var(--gray-500);
+        }
+        
+        body.dark .ingredient-details {
+            color: var(--gray-400);
+        }
+        
+        .ingredient-cost {
+            font-weight: 600;
+            color: var(--success);
+            margin-right: 16px;
+            font-size: 16px;
+        }
+        
+        .results-card {
+            position: sticky;
+            top: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .results-header {
             text-align: center;
+            margin-bottom: 30px;
         }
         
-        .results h3 {
-            margin-bottom: 20px;
-            font-size: 1.5em;
+        .results-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 8px;
         }
         
-        .result-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+        .results-subtitle {
+            opacity: 0.9;
+            font-size: 14px;
         }
         
         .result-item {
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
             padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
         }
         
-        .result-value {
-            font-size: 2em;
-            font-weight: bold;
-            margin-bottom: 5px;
+        .result-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.02);
         }
         
-        .result-label {
-            font-size: 0.9em;
-            opacity: 0.9;
-        }
-        
-        .highlight {
-            background: rgba(255,255,255,0.2);
+        .result-item.highlight {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
             transform: scale(1.05);
         }
         
-        @media (max-width: 768px) {
-            .form-row, .form-row-3 {
-                grid-template-columns: 1fr;
+        .result-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.8;
+            margin-bottom: 8px;
+        }
+        
+        .result-value {
+            font-size: 2rem;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .breakdown {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+        
+        .breakdown-label {
+            opacity: 0.9;
+        }
+        
+        .breakdown-value {
+            font-weight: 600;
+        }
+        
+        .recipe-management {
+            margin-top: 30px;
+        }
+        
+        .saved-recipes {
+            margin-top: 20px;
+        }
+        
+        .recipe-item {
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        body.dark .recipe-item {
+            background: var(--gray-700);
+            border-color: var(--gray-600);
+        }
+        
+        .recipe-item:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .recipe-header {
+            display: flex;
+            justify-content: between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        
+        .recipe-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 4px;
+        }
+        
+        body.dark .recipe-name {
+            color: white;
+        }
+        
+        .recipe-meta {
+            font-size: 14px;
+            color: var(--gray-500);
+            margin-bottom: 12px;
+        }
+        
+        body.dark .recipe-meta {
+            color: var(--gray-400);
+        }
+        
+        .recipe-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--gray-200);
+        }
+        
+        body.dark .stat-item {
+            background: var(--gray-600);
+            border-color: var(--gray-500);
+        }
+        
+        .stat-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        body.dark .stat-label {
+            color: var(--gray-400);
+        }
+        
+        .recipe-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--gray-500);
+        }
+        
+        body.dark .empty-state {
+            color: var(--gray-400);
+        }
+        
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
             }
-            
-            .container {
-                padding: 20px;
+            50% {
+                opacity: 0.5;
             }
-            
-            .header h1 {
-                font-size: 2em;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
             }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            color: white;
+        }
+        
+        .footer p {
+            margin-bottom: 8px;
+        }
+        
+        .footer a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background: var(--secondary);
+            color: white;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .tooltip {
+            position: relative;
+            cursor: help;
+        }
+        
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gray-900);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .tooltip:hover::after {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(-5px);
         }
     </style>
 </head>
 <body>
-    <button class="language-switch" onclick="toggleLanguage()">🇬🇧 EN / 🇹🇭 TH</button>
-    
     <div class="container">
         <div class="header">
-            <h1 id="title">🍰 Cake Cost Calculator</h1>
-            <p id="subtitle">Professional calculator for Thai bakeries</p>
+            <div class="controls">
+                <button class="language-switch" onclick="toggleLanguage()">
+                    <span id="lang-text">🇬🇧 EN / 🇹🇭 TH</span>
+                </button>
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <span id="theme-icon">🌙</span>
+                </button>
+            </div>
+            <h1 id="title">🍰 Professional Cake Calculator</h1>
+            <p id="subtitle">Advanced cost calculation system for professional Thai bakeries</p>
         </div>
         
-        <!-- Basic Information -->
-        <div class="section">
-            <h3 id="basic-info">📋 Basic Information</h3>
-            <div class="form-row">
-                <div class="form-group">
-                    <label id="cake-name-label">Cake Name</label>
-                    <input type="text" id="cake-name" placeholder="e.g., Chocolate Cake">
+        <div class="main-grid">
+            <div class="left-panel">
+                <!-- Basic Information -->
+                <div class="card fade-in">
+                    <div class="card-header">
+                        <div class="card-icon">📋</div>
+                        <h3 class="card-title" id="basic-info">Basic Information</h3>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label id="cake-name-label">Cake Name</label>
+                            <input type="text" id="cake-name" placeholder="e.g., Premium Chocolate Cake">
+                        </div>
+                        <div class="form-group">
+                            <label id="cake-quantity-label">Quantity (pieces)</label>
+                            <input type="number" id="cake-quantity" value="1" min="1">
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label id="cake-quantity-label">Number of Cakes</label>
-                    <input type="number" id="cake-quantity" value="1" min="1">
+                
+                <!-- Ingredients -->
+                <div class="card fade-in">
+                    <div class="card-header">
+                        <div class="card-icon">🥚</div>
+                        <h3 class="card-title" id="ingredients-title">Ingredients Management</h3>
+                    </div>
+                    <div class="form-row-4">
+                        <input type="text" id="ingredient-name" placeholder="Ingredient name">
+                        <input type="number" id="ingredient-quantity" placeholder="Qty (g/ml)">
+                        <input type="number" id="ingredient-price" placeholder="Price/kg (฿)">
+                        <button class="btn btn-success" onclick="addIngredient()" id="add-btn">Add</button>
+                    </div>
+                    <div id="ingredients-list"></div>
+                </div>
+                
+                <!-- Labor & Equipment -->
+                <div class="card fade-in">
+                    <div class="card-header">
+                        <div class="card-icon">👨‍🍳</div>
+                        <h3 class="card-title" id="labor-title">Labor & Equipment</h3>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label id="work-time-label">Work Time (minutes)</label>
+                            <input type="number" id="work-time" value="60">
+                        </div>
+                        <div class="form-group">
+                            <label id="hourly-rate-label">Hourly Rate (฿/hour)</label>
+                            <input type="number" id="hourly-rate" value="100">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label id="packaging-cost-label">Packaging Cost (฿)</label>
+                            <input type="number" id="packaging-cost" value="0" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label id="other-costs-label">Other Costs (฿)</label>
+                            <input type="number" id="other-costs" value="0" step="0.01">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label id="margin-label" class="tooltip" data-tooltip="Recommended: 35-50% for bakeries">Profit Margin (%)</label>
+                        <input type="number" id="margin" value="45" min="0" max="100">
+                    </div>
+                </div>
+                
+                <!-- Recipe Management -->
+                <div class="card fade-in">
+                    <div class="card-header">
+                        <div class="card-icon">💾</div>
+                        <h3 class="card-title" id="recipe-title">Recipe Management</h3>
+                    </div>
+                    <div class="form-row">
+                        <button class="btn btn-success" onclick="saveRecipe()" id="save-btn">Save Recipe</button>
+                        <button class="btn btn-warning" onclick="clearForm()" id="clear-btn">Clear Form</button>
+                    </div>
+                    
+                    <div class="saved-recipes">
+                        <h4 id="saved-recipes-title">Saved Recipes</h4>
+                        <div id="recipes-list"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="right-panel">
+                <!-- Results -->
+                <div class="results-card">
+                    <div class="results-header">
+                        <div class="results-title" id="results-title">📊 Cost Analysis</div>
+                        <div class="results-subtitle" id="results-subtitle">Real-time calculations</div>
+                    </div>
+                    
+                    <div class="result-item highlight">
+                        <div class="result-label" id="selling-price-label">Recommended Selling Price</div>
+                        <div class="result-value" id="selling-price">฿0.00</div>
+                    </div>
+                    
+                    <div class="result-item">
+                        <div class="result-label" id="total-cost-label">Total Production Cost</div>
+                        <div class="result-value" id="total-cost">฿0.00</div>
+                    </div>
+                    
+                    <div class="result-item">
+                        <div class="result-label" id="cost-per-cake-label">Cost per Piece</div>
+                        <div class="result-value" id="cost-per-cake">฿0.00</div>
+                    </div>
+                    
+                    <div class="breakdown">
+                        <div class="breakdown-item">
+                            <span class="breakdown-label" id="ingredients-cost-label">Ingredients</span>
+                            <span class="breakdown-value" id="ingredients-cost">฿0.00</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label" id="labor-cost-label">Labor</span>
+                            <span class="breakdown-value" id="labor-cost">฿0.00</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label" id="packaging-cost-breakdown">Packaging</span>
+                            <span class="breakdown-value" id="packaging-cost-value">฿0.00</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label" id="other-costs-breakdown">Other</span>
+                            <span class="breakdown-value" id="other-costs-value">฿0.00</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label" id="profit-label">Profit</span>
+                            <span class="breakdown-value" id="profit-value">฿0.00</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         
-        <!-- Ingredients -->
-        <div class="section">
-            <h3 id="ingredients-title">🥚 Ingredients</h3>
-            <div class="form-row-3">
-                <input type="text" id="ingredient-name" placeholder="Ingredient name">
-                <input type="number" id="ingredient-quantity" placeholder="Quantity (g)">
-                <input type="number" id="ingredient-price" placeholder="Price/kg (฿)">
-                <button class="btn" onclick="addIngredient()" id="add-btn">Add</button>
-            </div>
-            <div id="ingredients-list"></div>
-        </div>
-        
-        <!-- Labor & Settings -->
-        <div class="section">
-            <h3 id="labor-title">👨‍🍳 Labor & Profit</h3>
-            <div class="form-row">
-                <div class="form-group">
-                    <label id="work-time-label">Work Time (minutes)</label>
-                    <input type="number" id="work-time" value="60">
-                </div>
-                <div class="form-group">
-                    <label id="hourly-rate-label">Hourly Rate (฿/hour)</label>
-                    <input type="number" id="hourly-rate" value="100">
-                </div>
-            </div>
-            <div class="form-group">
-                <label id="margin-label">Profit Margin (%)</label>
-                <input type="number" id="margin" value="45">
-            </div>
-        </div>
-        
-        <!-- Results -->
-        <div class="results" id="results" style="display: none;">
-            <h3 id="results-title">📊 Calculation Results</h3>
-            <div class="result-grid">
-                <div class="result-item">
-                    <div class="result-value" id="total-cost">฿0.00</div>
-                    <div class="result-label" id="total-cost-label">Total Cost</div>
-                </div>
-                <div class="result-item">
-                    <div class="result-value" id="cost-per-cake">฿0.00</div>
-                    <div class="result-label" id="cost-per-cake-label">Cost per Cake</div>
-                </div>
-                <div class="result-item highlight">
-                    <div class="result-value" id="selling-price">฿0.00</div>
-                    <div class="result-label" id="selling-price-label">Recommended Selling Price</div>
-                </div>
-            </div>
+        <div class="footer">
+            <p><strong>🍰 Professional Cake Calculator</strong> <span class="badge">Premium</span></p>
+            <p>Designed for Thai bakeries • Made with ❤️ by professional developers</p>
+            <p><a href="#">Contact Support</a> • <a href="#">Feature Requests</a></p>
         </div>
     </div>
 
     <script>
         let currentLang = 'en';
+        let isDark = false;
         let ingredients = [];
+        let recipes = JSON.parse(localStorage.getItem('cakeRecipes') || '[]');
         
         const translations = {
             en: {
-                title: '🍰 Cake Cost Calculator',
-                subtitle: 'Professional calculator for Thai bakeries',
-                basicInfo: '📋 Basic Information',
+                title: '🍰 Professional Cake Calculator',
+                subtitle: 'Advanced cost calculation system for professional Thai bakeries',
+                basicInfo: 'Basic Information',
                 cakeNameLabel: 'Cake Name',
-                cakeQuantityLabel: 'Number of Cakes',
-                ingredientsTitle: '🥚 Ingredients',
-                laborTitle: '👨‍🍳 Labor & Profit',
+                cakeQuantityLabel: 'Quantity (pieces)',
+                ingredientsTitle: 'Ingredients Management',
+                laborTitle: 'Labor & Equipment',
                 workTimeLabel: 'Work Time (minutes)',
                 hourlyRateLabel: 'Hourly Rate (฿/hour)',
+                packagingCostLabel: 'Packaging Cost (฿)',
+                otherCostsLabel: 'Other Costs (฿)',
                 marginLabel: 'Profit Margin (%)',
                 addBtn: 'Add',
-                resultsTitle: '📊 Calculation Results',
-                totalCostLabel: 'Total Cost',
-                costPerCakeLabel: 'Cost per Cake',
+                recipeTitle: 'Recipe Management',
+                saveBtn: 'Save Recipe',
+                clearBtn: 'Clear Form',
+                savedRecipesTitle: 'Saved Recipes',
+                resultsTitle: '📊 Cost Analysis',
+                resultsSubtitle: 'Real-time calculations',
                 sellingPriceLabel: 'Recommended Selling Price',
-                remove: 'Remove'
+                totalCostLabel: 'Total Production Cost',
+                costPerCakeLabel: 'Cost per Piece',
+                ingredientsCostLabel: 'Ingredients',
+                laborCostLabel: 'Labor',
+                packagingCostBreakdown: 'Packaging',
+                otherCostsBreakdown: 'Other',
+                profitLabel: 'Profit',
+                edit: 'Edit',
+                delete: 'Delete',
+                load: 'Load',
+                emptyRecipes: 'No saved recipes yet',
+                emptyRecipesDesc: 'Start by creating your first recipe!'
             },
             th: {
-                title: '🍰 เครื่องคำนวณต้นทุนเค้ก',
-                subtitle: 'เครื่องคำนวณสำหรับเบเกอรี่ไทย',
-                basicInfo: '📋 ข้อมูลพื้นฐาน',
+                title: '🍰 เครื่องคำนวณต้นทุนเค้กแบบมืออาชีพ',
+                subtitle: 'ระบบคำนวณต้นทุนขั้นสูงสำหรับเบเกอรี่ไทย',
+                basicInfo: 'ข้อมูลพื้นฐาน',
                 cakeNameLabel: 'ชื่อเค้ก',
-                cakeQuantityLabel: 'จำนวนเค้ก',
-                ingredientsTitle: '🥚 วัตถุดิบ',
-                laborTitle: '👨‍🍳 แรงงานและกำไร',
+                cakeQuantityLabel: 'จำนวน (ชิ้น)',
+                ingredientsTitle: 'การจัดการวัตถุดิบ',
+                laborTitle: 'แรงงานและอุปกรณ์',
                 workTimeLabel: 'เวลาทำงาน (นาที)',
                 hourlyRateLabel: 'อัตราค่าจ้าง (฿/ชั่วโมง)',
+                packagingCostLabel: 'ต้นทุนบรรจุภัณฑ์ (฿)',
+                otherCostsLabel: 'ต้นทุนอื่นๆ (฿)',
                 marginLabel: 'กำไร (%)',
                 addBtn: 'เพิ่ม',
-                resultsTitle: '📊 ผลการคำนวณ',
-                totalCostLabel: 'ต้นทุนรวม',
-                costPerCakeLabel: 'ต้นทุนต่อชิ้น',
+                recipeTitle: 'การจัดการสูตร',
+                saveBtn: 'บันทึกสูตร',
+                clearBtn: 'ล้างฟอร์ม',
+                savedRecipesTitle: 'สูตรที่บันทึกไว้',
+                resultsTitle: '📊 การวิเคราะห์ต้นทุน',
+                resultsSubtitle: 'การคำนวณแบบเรียลไทม์',
                 sellingPriceLabel: 'ราคาขายแนะนำ',
-                remove: 'ลบ'
+                totalCostLabel: 'ต้นทุนการผลิตรวม',
+                costPerCakeLabel: 'ต้นทุนต่อชิ้น',
+                ingredientsCostLabel: 'วัตถุดิบ',
+                laborCostLabel: 'แรงงาน',
+                packagingCostBreakdown: 'บรรจุภัณฑ์',
+                otherCostsBreakdown: 'อื่นๆ',
+                profitLabel: 'กำไร',
+                edit: 'แก้ไข',
+                delete: 'ลบ',
+                load: 'โหลด',
+                emptyRecipes: 'ยังไม่มีสูตรที่บันทึกไว้',
+                emptyRecipesDesc: 'เริ่มต้นด้วยการสร้างสูตรแรกของคุณ!'
             }
         };
         
@@ -327,8 +897,17 @@
             updateLanguage();
         }
         
+        function toggleTheme() {
+            isDark = !isDark;
+            document.body.classList.toggle('dark', isDark);
+            document.getElementById('theme-icon').textContent = isDark ? '☀️' : '🌙';
+            localStorage.setItem('darkMode', isDark);
+        }
+        
         function updateLanguage() {
             const t = translations[currentLang];
+            
+            // Update all text elements
             document.getElementById('title').textContent = t.title;
             document.getElementById('subtitle').textContent = t.subtitle;
             document.getElementById('basic-info').textContent = t.basicInfo;
@@ -338,16 +917,31 @@
             document.getElementById('labor-title').textContent = t.laborTitle;
             document.getElementById('work-time-label').textContent = t.workTimeLabel;
             document.getElementById('hourly-rate-label').textContent = t.hourlyRateLabel;
+            document.getElementById('packaging-cost-label').textContent = t.packagingCostLabel;
+            document.getElementById('other-costs-label').textContent = t.otherCostsLabel;
             document.getElementById('margin-label').textContent = t.marginLabel;
             document.getElementById('add-btn').textContent = t.addBtn;
+            document.getElementById('recipe-title').textContent = t.recipeTitle;
+            document.getElementById('save-btn').textContent = t.saveBtn;
+            document.getElementById('clear-btn').textContent = t.clearBtn;
+            document.getElementById('saved-recipes-title').textContent = t.savedRecipesTitle;
             document.getElementById('results-title').textContent = t.resultsTitle;
+            document.getElementById('results-subtitle').textContent = t.resultsSubtitle;
+            document.getElementById('selling-price-label').textContent = t.sellingPriceLabel;
             document.getElementById('total-cost-label').textContent = t.totalCostLabel;
             document.getElementById('cost-per-cake-label').textContent = t.costPerCakeLabel;
-            document.getElementById('selling-price-label').textContent = t.sellingPriceLabel;
+            document.getElementById('ingredients-cost-label').textContent = t.ingredientsCostLabel;
+            document.getElementById('labor-cost-label').textContent = t.laborCostLabel;
+            document.getElementById('packaging-cost-breakdown').textContent = t.packagingCostBreakdown;
+            document.getElementById('other-costs-breakdown').textContent = t.otherCostsBreakdown;
+            document.getElementById('profit-label').textContent = t.profitLabel;
+            
+            updateIngredientsList();
+            updateRecipesList();
         }
         
         function addIngredient() {
-            const name = document.getElementById('ingredient-name').value;
+            const name = document.getElementById('ingredient-name').value.trim();
             const quantity = parseFloat(document.getElementById('ingredient-quantity').value);
             const price = parseFloat(document.getElementById('ingredient-price').value);
             
@@ -356,7 +950,8 @@
                     id: Date.now(),
                     name: name,
                     quantity: quantity,
-                    price: price
+                    price: price,
+                    cost: (quantity * price / 1000)
                 });
                 
                 updateIngredientsList();
@@ -366,6 +961,14 @@
                 document.getElementById('ingredient-name').value = '';
                 document.getElementById('ingredient-quantity').value = '';
                 document.getElementById('ingredient-price').value = '';
+                
+                // Add animation
+                setTimeout(() => {
+                    const items = document.querySelectorAll('.ingredient-item');
+                    if (items.length > 0) {
+                        items[items.length - 1].classList.add('fade-in');
+                    }
+                }, 100);
             }
         }
         
@@ -375,59 +978,240 @@
             calculateCosts();
         }
         
+        function editIngredient(id) {
+            const ingredient = ingredients.find(ing => ing.id === id);
+            if (ingredient) {
+                document.getElementById('ingredient-name').value = ingredient.name;
+                document.getElementById('ingredient-quantity').value = ingredient.quantity;
+                document.getElementById('ingredient-price').value = ingredient.price;
+                removeIngredient(id);
+            }
+        }
+        
         function updateIngredientsList() {
             const list = document.getElementById('ingredients-list');
             const t = translations[currentLang];
             
+            if (ingredients.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🥚</div>
+                        <p>${t.emptyRecipes || 'No ingredients added yet'}</p>
+                    </div>
+                `;
+                return;
+            }
+            
             list.innerHTML = ingredients.map(ing => `
                 <div class="ingredient-item">
-                    <span>${ing.name} - ${ing.quantity}g - ฿${ing.price}/kg</span>
-                    <button class="btn btn-small btn-danger" onclick="removeIngredient(${ing.id})">${t.remove}</button>
+                    <div class="ingredient-info">
+                        <div class="ingredient-name">${ing.name}</div>
+                        <div class="ingredient-details">${ing.quantity}g • ฿${ing.price}/kg</div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div class="ingredient-cost">฿${ing.cost.toFixed(2)}</div>
+                        <button class="btn btn-small btn-warning" onclick="editIngredient(${ing.id})">
+                            ${t.edit || 'Edit'}
+                        </button>
+                        <button class="btn btn-small btn-danger" onclick="removeIngredient(${ing.id})">
+                            ${t.delete || 'Delete'}
+                        </button>
+                    </div>
                 </div>
             `).join('');
         }
         
         function calculateCosts() {
-            if (ingredients.length === 0) {
-                document.getElementById('results').style.display = 'none';
-                return;
-            }
-            
             const cakeQuantity = parseInt(document.getElementById('cake-quantity').value) || 1;
             const workTime = parseInt(document.getElementById('work-time').value) || 0;
             const hourlyRate = parseInt(document.getElementById('hourly-rate').value) || 0;
+            const packagingCost = parseFloat(document.getElementById('packaging-cost').value) || 0;
+            const otherCosts = parseFloat(document.getElementById('other-costs').value) || 0;
             const margin = parseInt(document.getElementById('margin').value) || 0;
             
-            // Calculate ingredients cost
-            const ingredientsCost = ingredients.reduce((total, ing) => {
-                return total + (ing.quantity * ing.price / 1000);
-            }, 0);
-            
-            // Calculate labor cost
+            // Calculate costs
+            const ingredientsCost = ingredients.reduce((total, ing) => total + ing.cost, 0);
             const laborCost = (workTime / 60) * hourlyRate;
-            
-            // Total cost
-            const totalCost = ingredientsCost + laborCost;
-            
-            // Cost per cake
+            const totalCost = ingredientsCost + laborCost + packagingCost + otherCosts;
             const costPerCake = totalCost / cakeQuantity;
-            
-            // Selling price
             const sellingPrice = costPerCake * (1 + margin / 100);
+            const profit = sellingPrice - costPerCake;
             
-            // Update results
+            // Update display
+            document.getElementById('ingredients-cost').textContent = `฿${ingredientsCost.toFixed(2)}`;
+            document.getElementById('labor-cost').textContent = `฿${laborCost.toFixed(2)}`;
+            document.getElementById('packaging-cost-value').textContent = `฿${packagingCost.toFixed(2)}`;
+            document.getElementById('other-costs-value').textContent = `฿${otherCosts.toFixed(2)}`;
             document.getElementById('total-cost').textContent = `฿${totalCost.toFixed(2)}`;
             document.getElementById('cost-per-cake').textContent = `฿${costPerCake.toFixed(2)}`;
             document.getElementById('selling-price').textContent = `฿${sellingPrice.toFixed(2)}`;
+            document.getElementById('profit-value').textContent = `฿${profit.toFixed(2)}`;
+        }
+        
+        function saveRecipe() {
+            const name = document.getElementById('cake-name').value.trim();
+            if (!name || ingredients.length === 0) {
+                alert('Please enter cake name and add at least one ingredient');
+                return;
+            }
             
-            document.getElementById('results').style.display = 'block';
+            const recipe = {
+                id: Date.now(),
+                name: name,
+                cakeQuantity: parseInt(document.getElementById('cake-quantity').value) || 1,
+                ingredients: [...ingredients],
+                workTime: parseInt(document.getElementById('work-time').value) || 0,
+                hourlyRate: parseInt(document.getElementById('hourly-rate').value) || 0,
+                packagingCost: parseFloat(document.getElementById('packaging-cost').value) || 0,
+                otherCosts: parseFloat(document.getElementById('other-costs').value) || 0,
+                margin: parseInt(document.getElementById('margin').value) || 0,
+                createdAt: new Date().toLocaleDateString(),
+                totalCost: parseFloat(document.getElementById('total-cost').textContent.replace('฿', '')) || 0,
+                sellingPrice: parseFloat(document.getElementById('selling-price').textContent.replace('฿', '')) || 0
+            };
+            
+            recipes.push(recipe);
+            localStorage.setItem('cakeRecipes', JSON.stringify(recipes));
+            updateRecipesList();
+            
+            // Show success message
+            const btn = document.getElementById('save-btn');
+            const originalText = btn.textContent;
+            btn.textContent = '✅ Saved!';
+            btn.style.background = 'linear-gradient(135deg, var(--success), #059669)';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '';
+            }, 2000);
+        }
+        
+        function loadRecipe(id) {
+            const recipe = recipes.find(r => r.id === id);
+            if (!recipe) return;
+            
+            document.getElementById('cake-name').value = recipe.name;
+            document.getElementById('cake-quantity').value = recipe.cakeQuantity;
+            document.getElementById('work-time').value = recipe.workTime;
+            document.getElementById('hourly-rate').value = recipe.hourlyRate;
+            document.getElementById('packaging-cost').value = recipe.packagingCost;
+            document.getElementById('other-costs').value = recipe.otherCosts;
+            document.getElementById('margin').value = recipe.margin;
+            
+            ingredients = [...recipe.ingredients];
+            updateIngredientsList();
+            calculateCosts();
+        }
+        
+        function deleteRecipe(id) {
+            if (confirm('Are you sure you want to delete this recipe?')) {
+                recipes = recipes.filter(r => r.id !== id);
+                localStorage.setItem('cakeRecipes', JSON.stringify(recipes));
+                updateRecipesList();
+            }
+        }
+        
+        function clearForm() {
+            if (confirm('Clear all data? This cannot be undone.')) {
+                document.getElementById('cake-name').value = '';
+                document.getElementById('cake-quantity').value = '1';
+                document.getElementById('work-time').value = '60';
+                document.getElementById('hourly-rate').value = '100';
+                document.getElementById('packaging-cost').value = '0';
+                document.getElementById('other-costs').value = '0';
+                document.getElementById('margin').value = '45';
+                ingredients = [];
+                updateIngredientsList();
+                calculateCosts();
+            }
+        }
+        
+        function updateRecipesList() {
+            const list = document.getElementById('recipes-list');
+            const t = translations[currentLang];
+            
+            if (recipes.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📝</div>
+                        <p><strong>${t.emptyRecipes}</strong></p>
+                        <p>${t.emptyRecipesDesc}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            list.innerHTML = recipes.map(recipe => `
+                <div class="recipe-item fade-in">
+                    <div class="recipe-header">
+                        <div>
+                            <div class="recipe-name">${recipe.name}</div>
+                            <div class="recipe-meta">
+                                ${recipe.ingredients.length} ingredients • ${recipe.cakeQuantity} pieces • ${recipe.createdAt}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="recipe-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">฿${recipe.totalCost.toFixed(2)}</div>
+                            <div class="stat-label">Total Cost</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">฿${(recipe.totalCost / recipe.cakeQuantity).toFixed(2)}</div>
+                            <div class="stat-label">Per Piece</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">฿${recipe.sellingPrice.toFixed(2)}</div>
+                            <div class="stat-label">Selling Price</div>
+                        </div>
+                    </div>
+                    <div class="recipe-actions">
+                        <button class="btn btn-small" onclick="loadRecipe(${recipe.id})">
+                            ${t.load}
+                        </button>
+                        <button class="btn btn-small btn-danger" onclick="deleteRecipe(${recipe.id})">
+                            ${t.delete}
+                        </button>
+                    </div>
+                </div>
+            `).join('');
         }
         
         // Auto-calculate when inputs change
         document.addEventListener('input', calculateCosts);
         
+        // Enter key support for adding ingredients
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const target = e.target;
+                if (target.id === 'ingredient-name' || target.id === 'ingredient-quantity' || target.id === 'ingredient-price') {
+                    addIngredient();
+                }
+            }
+        });
+        
         // Initialize
-        updateLanguage();
+        function init() {
+            // Load theme preference
+            const savedTheme = localStorage.getItem('darkMode');
+            if (savedTheme === 'true') {
+                toggleTheme();
+            }
+            
+            updateLanguage();
+            updateRecipesList();
+            calculateCosts();
+            
+            // Add entrance animations
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.classList.add('fade-in');
+                }, index * 100);
+            });
+        }
+        
+        // Start the app
+        init();
     </script>
 </body>
 </html>
