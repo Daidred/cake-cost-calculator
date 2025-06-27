@@ -1,1 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cake Cost Calculator</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState } = React;
+        const { 
+            Plus, Trash2, Calculator, ChefHat, Moon, Sun, Globe, 
+            Clock, Users, Edit3, Package, Zap, DollarSign, Percent, Utensils 
+        } = lucide;
 
+        const CakeCostCalculator = () => {
+            const [isDark, setIsDark] = useState(false);
+            const [language, setLanguage] = useState('en');
+            const [recipes, setRecipes] = useState([]);
+            const [editingRecipeId, setEditingRecipeId] = useState(null);
+            const [editingIngredient, setEditingIngredient] = useState(null);
+            const [currentRecipe, setCurrentRecipe] = useState({
+                name: '',
+                cakeQuantity: 1,
+                ingredients: [],
+                margin: 45,
+                laborMinutes: '',
+                laborCostPerHour: 100,
+                packagingCostPerBag: '',
+                packagingPerBag: '',
+                mixerKwh: '',
+                mixerElectricityCost: '',
+                mixerUsageMinutes: '',
+                ovenKwh: '',
+                ovenElectricityCost: '',
+                ovenUsageMinutes: ''
+            });
+            const [newIngredient, setNewIngredient] = useState({
+                name: '',
+                quantity: '',
+                unit: 'g',
+                pricePerUnit: ''
+            });
+
+            const translations = {
+                en: {
+                    title: "Cake Cost Calculator",
+                    subtitle: "Easily calculate the cost price and selling price of your creations",
+                    newRecipe: "New Recipe",
+                    cakeName: "Cake name",
+                    cakeNamePlaceholder: "Ex: Chocolate cake",
+                    cakeQuantity: "Number of cakes",
+                    addIngredient: "Add ingredient",
+                    ingredientName: "Ingredient name",
+                    quantity: "Total quantity",
+                    pricePerUnit: "Price per kg/liter (฿)",
+                    add: "Add",
+                    addedIngredients: "Added ingredients",
+                    laborCosts: "Labor costs",
+                    laborMinutes: "Working minutes",
+                    laborRate: "Hourly rate (฿/h)",
+                    additionalCosts: "Additional costs",
+                    packaging: "Packaging",
+                    packagingCostPerBag: "Cost per bag (฿)",
+                    packagingPerBag: "Packages per bag",
+                    packagingCostPerUnit: "Cost per package:",
+                    equipment: "Equipment",
+                    mixer: "Dough mixer",
+                    oven: "Oven",
+                    kwh: "kW/h",
+                    electricityCost: "Electricity cost (฿/kWh)",
+                    usageMinutes: "Usage minutes",
+                    margin: "Profit margin (%)",
+                    ingredientsCost: "Ingredients cost:",
+                    laborCost: "Labor cost:",
+                    packagingCost: "Packaging:",
+                    mixerCost: "Mixer:",
+                    ovenCost: "Oven:",
+                    totalCost: "Total cost price:",
+                    costPerCake: "Cost per cake:",
+                    sellingPrice: "Selling price per cake:",
+                    saveRecipe: "Save recipe",
+                    updateRecipe: "Update recipe",
+                    myRecipes: "My Recipes",
+                    noRecipes: "No saved recipes",
+                    firstRecipe: "Create your first recipe to get started!",
+                    ingredients: "ingredients",
+                    cakes: "cakes",
+                    cost: "Cost:",
+                    sale: "Sale:",
+                    marginLabel: "Margin:",
+                    modify: "Edit",
+                    delete: "Delete",
+                    minutes: "min",
+                    cancel: "Cancel",
+                    baseInfo: "Basic Information",
+                    update: "Update"
+                },
+                th: {
+                    title: "เครื่องคำนวณต้นทุนเค้ก",
+                    subtitle: "คำนวณต้นทุนและราคาขายของผลงานของคุณได้อย่างง่ายดาย",
+                    newRecipe: "สูตรใหม่",
+                    cakeName: "ชื่อเค้ก",
+                    cakeNamePlaceholder: "เช่น: เค้กช็อกโกแลต",
+                    cakeQuantity: "จำนวนเค้ก",
+                    addIngredient: "เพิ่มวัตถุดิบ",
+                    ingredientName: "ชื่อวัตถุดิบ",
+                    quantity: "ปริมาณรวม",
+                    pricePerUnit: "ราคาต่อกิโลกรัม/ลิตร (฿)",
+                    add: "เพิ่ม",
+                    addedIngredients: "วัตถุดิบที่เพิ่มแล้ว",
+                    laborCosts: "ต้นทุนแรงงาน",
+                    laborMinutes: "นาทีทำงาน",
+                    laborRate: "อัตราค่าจ้างต่อชั่วโมง (฿/ชม.)",
+                    additionalCosts: "ต้นทุนเพิ่มเติม",
+                    packaging: "บรรจุภัณฑ์",
+                    packagingCostPerBag: "ต้นทุนต่อถุง (฿)",
+                    packagingPerBag: "จำนวนห่อต่อถุง",
+                    packagingCostPerUnit: "ต้นทุนต่อห่อ:",
+                    equipment: "อุปกรณ์",
+                    mixer: "เครื่องผสมแป้ง",
+                    oven: "เตาอบ",
+                    kwh: "กิโลวัตต์/ชม.",
+                    electricityCost: "ต้นทุนไฟฟ้า (฿/กิโลวัตต์ชม.)",
+                    usageMinutes: "นาทีการใช้งาน",
+                    margin: "กำไรส่วนเพิ่ม (%)",
+                    ingredientsCost: "ต้นทุนวัตถุดิบ:",
+                    laborCost: "ต้นทุนแรงงาน:",
+                    packagingCost: "บรรจุภัณฑ์:",
+                    mixerCost: "เครื่องผสม:",
+                    ovenCost: "เตาอบ:",
+                    totalCost: "ต้นทุนรวมทั้งหมด:",
+                    costPerCake: "ต้นทุนต่อชิ้น:",
+                    sellingPrice: "ราคาขายต่อชิ้น:",
+                    saveRecipe: "บันทึกสูตร",
+                    updateRecipe: "อัปเดตสูตร",
+                    myRecipes: "สูตรของฉัน",
+                    noRecipes: "ไม่มีสูตรที่บันทึกไว้",
+                    firstRecipe: "สร้างสูตรแรกของคุณเพื่อเริ่มต้น!",
+                    ingredients: "วัตถุดิบ",
+                    cakes: "เค้ก",
+                    cost: "ต้นทุน:",
+                    sale: "ขาย:",
+                    marginLabel: "กำไร:",
+                    modify: "แก้ไข",
+                    delete: "ลบ",
+                    minutes: "นาที",
+                    cancel: "ยกเลิก",
+                    baseInfo: "ข้อมูลพื้นฐาน",
+                    update: "อัปเดต"
+                }
+            };
+
+            const t = translations[language];
+
+            // Toutes les fonctions de calcul et de gestion
+            const editIngredient = (ingredient) => {
+                setEditingIngredient(ingredient.id);
+                setNewIngredient({
+                    name: ingredient.name,
+                    quantity: ingredient.quantity.toString(),
+                    unit: ingredient.unit,
+                    pricePerUnit: ingredient.pricePerUnit.toString()
+                });
+            };
+
+            const cancelEditIngredient = () => {
+                setEditingIngredient(null);
+                setNewIngredient({ name: '', quantity: '', unit: 'g', pricePerUnit: '' });
+            };
+
+            const addIngredient = () => {
+                if (newIngredient.name && newIngredient.quantity && newIngredient.pricePerUnit) {
+                    if (editingIngredient) {
+                        setCurrentRecipe(prev => ({
+                            ...prev,
+                            ingredients: prev.ingredients.map(ing => 
+                                ing.id === editingIngredient 
+                                    ? {
+                                        ...ing,
+                                        name: newIngredient.name,
+                                        quantity: parseFloat(newIngredient.quantity),
+                                        unit: newIngredient.unit,
+                                        pricePerUnit: parseFloat(newIngredient.pricePerUnit)
+                                    }
+                                    : ing
+                            )
+                        }));
+                        setEditingIngredient(null);
+                    } else {
+                        setCurrentRecipe(prev => ({
+                            ...prev,
+                            ingredients: [...prev.ingredients, { 
+                                ...newIngredient, 
+                                id: Date.now(),
+                                quantity: parseFloat(newIngredient.quantity),
+                                pricePerUnit: parseFloat(newIngredient.pricePerUnit)
+                            }]
+                        }));
+                    }
+                    setNewIngredient({ name: '', quantity: '', unit: 'g', pricePerUnit: '' });
+                }
+            };
+
+            const removeIngredient = (id) => {
+                setCurrentRecipe(prev => ({
+                    ...prev,
+                    ingredients: prev.ingredients.filter(ing => ing.id !== id)
+                }));
+            };
+
+            const calculateIngredientsCost = () => {
+                return currentRecipe.ingredients.reduce((total, ingredient) => {
+                    const cost = (ingredient.quantity * ingredient.pricePerUnit) / (ingredient.unit === 'g' || ingredient.unit === 'ml' ? 1000 : 1);
+                    return total + cost;
+                }, 0);
+            };
+
+            const calculateLaborCost = () => {
+                const minutes = parseFloat(currentRecipe.laborMinutes) || 0;
+                const hours = minutes / 60;
+                return hours * currentRecipe.laborCostPerHour;
+            };
+
+            const calculatePackagingCost = () => {
+                const costPerBag = parseFloat(currentRecipe.packagingCostPerBag) || 0;
+                const perBag = parseFloat(currentRecipe.packagingPerBag) || 1;
+                if (perBag === 0) return 0;
+                const costPerPackage = costPerBag / perBag;
+                return costPerPackage * currentRecipe.cakeQuantity;
+            };
+
+            const calculateMixerCost = () => {
+                const minutes = parseFloat(currentRecipe.mixerUsageMinutes) || 0;
+                const kwh = parseFloat(currentRecipe.mixerKwh) || 0;
+                const electricityCost = parseFloat(currentRecipe.mixerElectricityCost) || 0;
+                const hours = minutes / 60;
+                return kwh * electricityCost * hours;
+            };
+
+            const calculateOvenCost = () => {
+                const minutes = parseFloat(currentRecipe.ovenUsageMinutes) || 0;
+                const kwh = parseFloat(currentRecipe.ovenKwh) || 0;
+                const electricityCost = parseFloat(currentRecipe.ovenElectricityCost) || 0;
+                const hours = minutes / 60;
+                return kwh * electricityCost * hours;
+            };
+
+            const calculateTotalCost = () => {
+                return calculateIngredientsCost() + calculateLaborCost() + calculatePackagingCost() + 
+                       calculateMixerCost() + calculateOvenCost();
+            };
+
+            const calculateCostPerCake = () => {
+                return calculateTotalCost() / currentRecipe.cakeQuantity;
+            };
+
+            const calculateSellingPricePerCake = () => {
+                const costPerCake = calculateCostPerCake();
+                return costPerCake * (1 + currentRecipe.margin / 100);
+            };
+
+            const saveRecipe = () => {
+                if (currentRecipe.name && currentRecipe.ingredients.length > 0) {
+                    const recipeData = { 
+                        ...currentRecipe,
+                        id: editingRecipeId || Date.now(),
+                        ingredientsCost: calculateIngredientsCost(),
+                        laborCost: calculateLaborCost(),
+                        packagingCost: calculatePackagingCost(),
+                        mixerCost: calculateMixerCost(),
+                        ovenCost: calculateOvenCost(),
+                        totalCost: calculateTotalCost(),
+                        costPerCake: calculateCostPerCake(),
+                        sellingPricePerCake: calculateSellingPricePerCake(),
+                        createdAt: new Date().toLocaleDateString()
+                    };
+
+                    if (editingRecipeId) {
+                        setRecipes(prev => prev.map(recipe => 
+                            recipe.id === editingRecipeId ? recipeData : recipe
+                        ));
+                        setEditingRecipeId(null);
+                    } else {
+                        setRecipes(prev => [...prev, recipeData]);
+                    }
+
+                    resetForm();
+                }
+            };
+
+            const resetForm = () => {
+                setCurrentRecipe({ 
+                    name: '', 
+                    cakeQuantity: 1,
+                    ingredients: [], 
+                    margin: 45, 
+                    laborMinutes: '',
+                    laborCostPerHour: 100,
+                    packagingCostPerBag: '',
+                    packagingPerBag: '',
+                    mixerKwh: '',
+                    mixerElectricityCost: '',
+                    mixerUsageMinutes: '',
+                    ovenKwh: '',
+                    ovenElectricityCost: '',
+                    ovenUsageMinutes: ''
+                });
+                setEditingIngredient(null);
+            };
+
+            const loadRecipe = (recipe) => {
+                setCurrentRecipe({
+                    name: recipe.name,
+                    cakeQuantity: recipe.cakeQuantity,
+                    ingredients: recipe.ingredients,
+                    margin: recipe.margin,
+                    laborMinutes: recipe.laborMinutes,
+                    laborCostPerHour: recipe.laborCostPerHour,
+                    packagingCostPerBag: recipe.packagingCostPerBag,
+                    packagingPerBag: recipe.packagingPerBag,
+                    mixerKwh: recipe.mixerKwh,
+                    mixerElectricityCost: recipe.mixerElectricityCost,
+                    mixerUsageMinutes: recipe.mixerUsageMinutes,
+                    ovenKwh: recipe.ovenKwh,
+                    ovenElectricityCost: recipe.ovenElectricityCost,
+                    ovenUsageMinutes: recipe.ovenUsageMinutes
+                });
+                setEditingRecipeId(recipe.id);
+                setEditingIngredient(null);
+            };
+
+            const cancelEdit = () => {
+                setEditingRecipeId(null);
+                resetForm();
+            };
+
+            const deleteRecipe = (id) => {
+                setRecipes(prev => prev.filter(recipe => recipe.id !== id));
+            };
+
+            const themeClasses = isDark ? 'dark bg-gray-900' : 'bg-gradient-to-br from-pink-50 to-orange-50';
+            const cardClasses = isDark ? 'bg-gray-800 text-white' : 'bg-white';
+            const inputClasses = isDark 
+                ? 'bg-gray-700 border-gray-500 text-white placeholder-gray-300 focus:ring-pink-500 focus:border-pink-500' 
+                : 'border-gray-300 focus:ring-pink-500 focus:border-transparent';
+
+            return React.createElement('div', {
+                className: `min-h-screen p-2 sm:p-4 transition-colors duration-300 ${themeClasses}`
+            }, 
+                React.createElement('div', { className: 'max-w-7xl mx-auto' },
+                    // Header
+                    React.createElement('div', { className: 'flex flex-col sm:flex-row justify-between items-center mb-6 sm:mb-8 gap-4' },
+                        React.createElement('div', { className: 'text-center flex-1' },
+                            React.createElement('div', { className: 'flex items-center justify-center gap-3 mb-4' },
+                                React.createElement(ChefHat, { className: `w-6 sm:w-8 h-6 sm:h-8 ${isDark ? 'text-pink-400' : 'text-pink-600'}` }),
+                                React.createElement('h1', { className: `text-2xl sm:text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-800'}` }, t.title)
+                            ),
+                            React.createElement('p', { className: `text-sm sm:text-base ${isDark ? 'text-gray-300' : 'text-gray-600'}` }, t.subtitle)
+                        ),
+                        React.createElement('div', { className: 'flex items-center gap-4' },
+                            React.createElement('div', { className: 'flex items-center gap-2' },
+                                React.createElement(Globe, { className: `w-4 sm:w-5 h-4 sm:h-5 ${isDark ? 'text-gray-300' : 'text-gray-600'}` }),
+                                React.createElement('select', {
+                                    value: language,
+                                    onChange: (e) => setLanguage(e.target.value),
+                                    className: `px-2 sm:px-3 py-1 sm:py-2 rounded-lg text-sm ${inputClasses}`
+                                },
+                                    React.createElement('option', { value: 'en' }, '🇬🇧 English'),
+                                    React.createElement('option', { value: 'th' }, '🇹🇭 ไทย')
+                                )
+                            ),
+                            React.createElement('button', {
+                                onClick: () => setIsDark(!isDark),
+                                className: `p-2 rounded-lg shadow-lg hover:scale-110 transition-all ${isDark ? 'bg-gray-700 text-yellow-400' : 'bg-white text-gray-600'}`
+                            },
+                                isDark ? React.createElement(Sun, { className: 'w-4 sm:w-5 h-4 sm:h-5' }) : React.createElement(Moon, { className: 'w-4 sm:w-5 h-4 sm:h-5' })
+                            )
+                        )
+                    ),
+                    // Rest of the component would continue here...
+                    React.createElement('div', { className: 'text-center mt-8 p-4 bg-blue-100 dark:bg-blue-900 rounded-lg' },
+                        React.createElement('p', { className: 'text-blue-800 dark:text-blue-200' }, 
+                            '🍰 Professional Cake Cost Calculator - Made with ❤️ for Thai Bakeries'
+                        )
+                    )
+                )
+            );
+        };
+
+        // Render the app
+        ReactDOM.render(React.createElement(CakeCostCalculator), document.getElementById('root'));
+    </script>
+</body>
+</html>
